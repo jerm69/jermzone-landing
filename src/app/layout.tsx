@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import ThemeRegistry from './ThemeRegistry';
 
 export const metadata: Metadata = {
-  title: 'JERMZONE',
-  description: 'Software projects by Jerm — league management, games, and more.',
+  title: 'Jeremy Terhaar | Software Engineer',
+  description: 'Jeremy Terhaar — Software Engineer specializing in DevOps, CI/CD, and platform engineering.',
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23152a42'/><text x='50' y='62' font-family='Arial, sans-serif' font-size='46' font-weight='700' fill='%239c3230' text-anchor='middle'>JT</text></svg>",
   },
 };
 

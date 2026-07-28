@@ -6,8 +6,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#1a1a2e' },
-    secondary: { main: '#e94560' },
+    primary: { main: '#152a42' },
+    secondary: { main: '#9c3230' },
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
