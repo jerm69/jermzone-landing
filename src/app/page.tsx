@@ -17,6 +17,9 @@ import {
   SchoolOutlined as SchoolIcon,
 } from '@mui/icons-material';
 
+// Retro font class for applying Space Mono
+const RETRO_FONT = "'Space Mono', 'Courier New', monospace";
+
 // Palette pulled directly from the locker-photo reference: navy, slate blue,
 // charcoal, maroon/red, burnt orange, and mustard.
 const NAVY_DARK = '#152a42';
@@ -168,13 +171,13 @@ export default function LandingPage() {
       <Box
         sx={{
           position: 'sticky', top: 0, zIndex: 10,
-          borderBottom: '1px solid rgba(80,137,173,0.2)',
+          borderBottom: '2px solid rgba(80,137,173,0.4)',
           bgcolor: 'rgba(21,42,66,0.9)',
           backdropFilter: 'blur(8px)',
         }}
       >
         <Container maxWidth="lg" sx={{ py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+          <Typography sx={{ fontWeight: 800, letterSpacing: '-0.02em', fontFamily: RETRO_FONT }}>
             JT
           </Typography>
           <Stack direction="row" spacing={3} sx={{ display: { xs: 'none', sm: 'flex' } }}>
@@ -182,7 +185,7 @@ export default function LandingPage() {
               <Typography
                 key={label}
                 variant="body2"
-                sx={{ color: 'rgba(169,171,174,0.85)', cursor: 'pointer', '&:hover': { color: 'white' } }}
+                sx={{ color: 'rgba(169,171,174,0.85)', cursor: 'pointer', '&:hover': { color: 'white' }, fontFamily: RETRO_FONT }}
                 onClick={() => document.getElementById(label.toLowerCase())?.scrollIntoView({ behavior: 'smooth' })}
               >
                 {label}
@@ -252,7 +255,7 @@ export default function LandingPage() {
         </Typography>
         <Stack spacing={4}>
           {experience.map((job) => (
-            <Card key={job.company} sx={{ bgcolor: BG_CARD, border: '1px solid rgba(80,137,173,0.18)', borderRadius: 3 }}>
+            <Card key={job.company} sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
               <CardContent sx={{ p: { xs: 3, md: 4 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
                   <Box
@@ -284,7 +287,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
           ))}
-          <Card sx={{ bgcolor: BG_CARD, border: '1px solid rgba(80,137,173,0.18)', borderRadius: 3 }}>
+          <Card sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
             <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box
                 sx={{
@@ -318,7 +321,7 @@ export default function LandingPage() {
         <Grid container spacing={3}>
           {skillGroups.map((group) => (
             <Grid item xs={12} sm={6} key={group.label}>
-              <Typography variant="subtitle2" sx={{ color: 'rgba(169,171,174,0.7)', mb: 1.5, letterSpacing: 1 }}>
+              <Typography variant="subtitle2" sx={{ color: 'rgba(169,171,174,0.7)', mb: 1.5, letterSpacing: 1, fontFamily: RETRO_FONT }}>
                 {group.label.toUpperCase()}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -327,11 +330,12 @@ export default function LandingPage() {
                     key={skill}
                     label={skill}
                     sx={{
-                      bgcolor: 'rgba(80,137,173,0.1)',
-                      color: 'rgba(169,171,174,0.9)',
-                      border: '1px solid rgba(80,137,173,0.3)',
-                      '&:hover': { bgcolor: 'rgba(156,50,48,0.15)', borderColor: ACCENT },
+                      bgcolor: 'rgba(80,137,173,0.15)',
+                      color: 'rgba(169,171,174,0.95)',
+                      border: '2px solid rgba(80,137,173,0.4)',
+                      '&:hover': { bgcolor: 'rgba(156,50,48,0.2)', borderColor: ACCENT },
                       transition: 'all 0.2s',
+                      fontFamily: RETRO_FONT,
                     }}
                   />
                 ))}
@@ -362,8 +366,8 @@ export default function LandingPage() {
                   sx={{
                     height: '100%',
                     bgcolor: BG_CARD,
-                    border: '1px solid rgba(80,137,173,0.18)',
-                    borderRadius: 3,
+                    border: '2px solid rgba(80,137,173,0.4)',
+                    borderRadius: 1,
                     transition: 'transform 0.25s, box-shadow 0.25s, border-color 0.25s',
                     textDecoration: 'none',
                     display: 'block',
@@ -445,7 +449,7 @@ export default function LandingPage() {
 
       {/* About */}
       <Container maxWidth="md" sx={{ py: 10 }}>
-        <Card sx={{ bgcolor: BG_CARD, border: '1px solid rgba(80,137,173,0.18)', borderRadius: 3 }}>
+        <Card sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
           <CardContent sx={{ p: { xs: 4, md: 6 }, textAlign: 'center' }}>
             <Typography variant="overline" sx={{ color: ACCENT, letterSpacing: 3 }}>
               About
@@ -506,9 +510,9 @@ export default function LandingPage() {
       </Container>
 
       {/* Footer */}
-      <Divider sx={{ borderColor: 'rgba(80,137,173,0.18)' }} />
+      <Divider sx={{ borderColor: 'rgba(80,137,173,0.4)', borderWidth: 2 }} />
       <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body2" sx={{ color: 'rgba(169,171,174,0.4)' }}>
+        <Typography variant="body2" sx={{ color: 'rgba(169,171,174,0.6)', fontFamily: RETRO_FONT }}>
           © {new Date().getFullYear()} Jeremy Terhaar
         </Typography>
       </Box>

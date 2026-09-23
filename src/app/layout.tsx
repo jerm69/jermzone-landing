@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ThemeRegistry from './ThemeRegistry';
+import Telemetry from '@/components/Telemetry';
 
 export const metadata: Metadata = {
   title: 'Jeremy Terhaar | Software Engineer',
@@ -12,8 +13,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+      </head>
       <body>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          <Telemetry app="jermzone" />
+          {children}
+        </ThemeRegistry>
       </body>
     </html>
   );
