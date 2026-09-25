@@ -4,24 +4,56 @@ import { ReactNode } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+export const colors = {
+  navy: '#152a42',
+  ink: '#0e1d2e',
+  charcoal: '#26282c',
+  slate: '#4c6672',
+  gray: '#a9abae',
+  bone: '#e8e6e1',
+  steel: '#5089ad',
+  sky: '#8fbbd6',
+  red: '#9c3230',
+  rose: '#d68f8d',
+  orange: '#c1652f',
+  mustard: '#c99a3e',
+  gold: '#e0bd6f',
+};
+
+export const mono = '"Space Mono", "Courier New", monospace';
+
 const theme = createTheme({
   palette: {
-    primary: { main: '#152a42' },
-    secondary: { main: '#9c3230' },
+    mode: 'dark',
+    primary: { main: colors.sky },
+    secondary: { main: colors.gold },
+    background: { default: colors.navy, paper: colors.charcoal },
+    text: { primary: colors.bone, secondary: colors.gray },
+    divider: colors.slate,
   },
+  shape: { borderRadius: 3 },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
+    h1: { fontFamily: mono, fontWeight: 700 },
+    h2: { fontFamily: mono, fontWeight: 700 },
+    h3: { fontFamily: mono, fontWeight: 700 },
+    h4: { fontFamily: mono, fontWeight: 700 },
+    h5: { fontFamily: mono, fontWeight: 700 },
+    h6: { fontFamily: mono, fontWeight: 700 },
+    overline: { fontFamily: mono, letterSpacing: '0.14em' },
   },
   components: {
-    MuiTypography: {
+    MuiCssBaseline: {
       styleOverrides: {
-        h1: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        h2: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        h3: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        h4: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        h5: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        h6: { fontFamily: '"Space Mono", "Courier New", monospace' },
-        overline: { fontFamily: '"Space Mono", "Courier New", monospace' },
+        'html': { scrollBehavior: 'smooth' },
+        'body': { backgroundColor: colors.navy },
+        'a:focus-visible, button:focus-visible': { outline: `2px solid ${colors.gold}`, outlineOffset: 3 },
+        '@media (prefers-reduced-motion: reduce)': { html: { scrollBehavior: 'auto' } },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: { textTransform: 'none', fontWeight: 700, boxShadow: 'none', '&:hover': { boxShadow: 'none' } },
       },
     },
   },

@@ -1,9 +1,7 @@
 'use client';
 
-import {
-  Box, Container, Typography, Button, Card, CardContent,
-  Grid, Chip, Stack, Divider
-} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Button, Container, IconButton, Stack, Typography } from '@mui/material';
 import {
   SportsBasketball as BasketballIcon,
   SportsEsports as GamesIcon,
@@ -13,32 +11,12 @@ import {
   LinkedIn as LinkedInIcon,
   Email as EmailIcon,
   FileDownload as DownloadIcon,
-  WorkOutline as WorkIcon,
-  SchoolOutlined as SchoolIcon,
+  ArrowBack as PreviousIcon,
+  ArrowForward as NextIcon,
+  Pause as PauseIcon,
+  PlayArrow as PlayIcon,
 } from '@mui/icons-material';
-
-// Retro font class for applying Space Mono
-const RETRO_FONT = "'Space Mono', 'Courier New', monospace";
-
-// Palette pulled directly from the locker-photo reference: navy, slate blue,
-// charcoal, maroon/red, burnt orange, and mustard.
-const NAVY_DARK = '#152a42';
-const SLATE = '#4c6672';
-const STEEL_BLUE = '#5089ad';
-const CHARCOAL_DARK = '#26282c';
-const MAROON = '#7c2328';
-const RED = '#9c3230';
-const ORANGE = '#c1652f';
-const MUSTARD = '#c99a3e';
-// Light gray from the locker swatches (#a9abae → rgb(169,171,174)) is used
-// directly as rgba(169,171,174, alpha) throughout for muted text/borders.
-
-const ACCENT = RED;
-const ACCENT_BLUE = STEEL_BLUE;
-const ACCENT_MUSTARD = MUSTARD;
-const ACCENT_ORANGE = ORANGE;
-const BG_BASE = NAVY_DARK;
-const BG_CARD = CHARCOAL_DARK;
+import { colors, mono } from './ThemeRegistry';
 
 const CONTACT = {
   email: 'jterhaar91@gmail.com',
@@ -49,45 +27,35 @@ const CONTACT = {
 const projects = [
   {
     title: 'WULv2 Basketball League',
-    description:
-      'Full-stack basketball league management system — team rosters, game scheduling, standings, community forums, and multi-tenant league support.',
-    icon: <BasketballIcon sx={{ fontSize: 40 }} />,
-    color: ACCENT,
-    bgDark: '#3a1f1f',
+    description: 'A full-stack league platform for rosters, schedules, standings and community, with support for multiple leagues.',
+    icon: <BasketballIcon fontSize="large" />,
+    color: colors.rose,
     path: '/league',
     tags: ['Next.js', 'Node.js', 'PostgreSQL', 'Prisma'],
     status: 'live' as const,
   },
   {
     title: 'Games',
-    description:
-      'Classic browser games — Minesweeper, Tic-Tac-Toe, and Checkers, each with multiple difficulty levels.',
-    icon: <GamesIcon sx={{ fontSize: 40 }} />,
-    color: ACCENT_BLUE,
-    bgDark: '#1c2e3a',
+    description: 'Six classic browser games: Blackjack, Checkers, Minesweeper, Snake, Tic-Tac-Toe and Video Poker.',
+    icon: <GamesIcon fontSize="large" />,
+    color: colors.sky,
     path: '/games',
     tags: ['Next.js', 'Tailwind CSS', 'TypeScript'],
     status: 'live' as const,
   },
   {
     title: 'FlightRadar Live',
-    description:
-      'Real-time flight tracking integration pulling live ADS-B data — map visualisation, aircraft info panels, and flight history.',
-    icon: <FlightIcon sx={{ fontSize: 40 }} />,
-    color: ACCENT_ORANGE,
-    bgDark: '#3a2716',
-    path: '#',
+    description: 'An upcoming flight-tracking project exploring live ADS-B data, aircraft details and flight history.',
+    icon: <FlightIcon fontSize="large" />,
+    color: colors.orange,
     tags: ['ADS-B', 'Maps', 'Real-time', 'API'],
     status: 'soon' as const,
   },
   {
     title: 'Dev Dashboard',
-    description:
-      'Personal engineering dashboard — process health, server metrics, and quick-launch links for active projects.',
-    icon: <DashboardIcon sx={{ fontSize: 40 }} />,
-    color: ACCENT_MUSTARD,
-    bgDark: '#332913',
-    path: '#',
+    description: 'An upcoming dashboard concept for process health, server metrics and quick links to active projects.',
+    icon: <DashboardIcon fontSize="large" />,
+    color: colors.gold,
     tags: ['Monitoring', 'PM2', 'Node.js'],
     status: 'soon' as const,
   },
@@ -108,413 +76,244 @@ const experience = [
       { title: 'Software Engineer I', dates: 'Sep 2019 – Oct 2022' },
     ],
     bullets: [
-      'Designed and led the implementation of a standardized CI/CD platform leveraging GitHub Actions and modular PowerShell tooling to automate provisioning, enforce deployment quality gates, and unify release workflows across warehouse systems.',
-      'Developed and maintained a full-stack warehouse management feature, designing RESTful APIs and React-based front-end interfaces while integrating automated validation and continuous testing into deployment pipelines.',
-      'Improved reliability and operational resilience of a 24/7 supply chain platform serving 1000+ users by reducing deployment pipelines from days to under an hour and strengthening release consistency across internal and third-party integrations.',
+      'Led a standardized CI/CD platform using GitHub Actions and modular PowerShell tooling for provisioning and deployment quality gates.',
+      'Built warehouse management APIs and React interfaces with automated validation and continuous testing.',
+      'Strengthened releases for a 24/7 supply chain platform serving 1000+ users, reducing pipelines from days to under an hour.',
     ],
   },
   {
     company: 'BEI Services',
     roles: [{ title: 'Software Engineer', dates: 'Sep 2016 – Sep 2019' }],
     bullets: [
-      'Designed and delivered full-stack web applications and RESTful APIs, owning database schema design, backend service development, and frontend implementation to support enterprise client workflows.',
-      'Engineered scalable SQL solutions and third-party system integrations, improving data reliability and streamlining business operations for external partners.',
+      'Delivered full-stack web applications and REST APIs, from database schema to frontend, for enterprise clients.',
+      'Built SQL solutions and third-party integrations to improve data reliability and business workflows.',
     ],
   },
 ];
 
-function LineChartMotif() {
+const sectionSx = { py: { xs: 5, md: 7 }, scrollMarginTop: { xs: '112px', sm: '80px' } };
+const labelSx = { fontFamily: mono, color: colors.gold, letterSpacing: '0.14em', fontSize: '0.72rem', textTransform: 'uppercase' };
+const secondarySx = { color: colors.gray, lineHeight: 1.65 };
+const outlineSx = { borderColor: colors.slate, color: colors.bone, '&:hover': { borderColor: colors.sky, bgcolor: colors.ink } };
+
+function SectionHeading({ index, title }: { index: string; title: string }) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 3, pb: 1.5, borderBottom: `1px solid ${colors.slate}` }}>
+      <Typography component="span" sx={labelSx}>{index}</Typography>
+      <Typography variant="h5" component="h2" sx={{ fontSize: { xs: '1.35rem', md: '1.65rem' } }}>{title}</Typography>
+    </Box>
+  );
+}
+
+function ProjectsCarousel() {
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMotion = () => setReducedMotion(media.matches);
+    const updateVisibility = () => setVisible(!document.hidden);
+    updateMotion();
+    updateVisibility();
+    media.addEventListener('change', updateMotion);
+    document.addEventListener('visibilitychange', updateVisibility);
+    return () => {
+      media.removeEventListener('change', updateMotion);
+      document.removeEventListener('visibilitychange', updateVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!playing || hovered || focused || !visible || reducedMotion) return;
+    const timer = window.setTimeout(() => setIndex((current) => (current + 1) % projects.length), 7000);
+    return () => window.clearTimeout(timer);
+  }, [index, playing, hovered, focused, visible, reducedMotion]);
+
+  const select = (next: number) => {
+    const destination = (next + projects.length) % projects.length;
+    setIndex(destination);
+    setPlaying(false);
+    setAnnouncement(`${projects[destination].title}, ${destination + 1} of ${projects.length}`);
+  };
+  const project = projects[index];
+
   return (
     <Box
-      component="svg"
-      viewBox="0 0 600 200"
-      preserveAspectRatio="none"
-      sx={{
-        position: 'absolute',
-        bottom: 0, left: 0,
-        width: '100%', height: '55%',
-        opacity: 0.35,
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured apps"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
       }}
     >
-      <polyline
-        points="0,150 60,140 120,160 180,110 240,130 300,80 360,95 420,55 480,70 540,30 600,45"
-        fill="none"
-        stroke={ACCENT_BLUE}
-        strokeWidth="2"
-        strokeDasharray="1000"
-        strokeDashoffset="1000"
-        style={{ animation: 'draw-line 2.4s ease-out forwards' }}
-      />
-      <polyline
-        points="0,180 60,170 120,175 180,150 240,155 300,120 360,130 420,100 480,105 540,75 600,60"
-        fill="none"
-        stroke={ACCENT}
-        strokeWidth="2"
-        strokeDasharray="1000"
-        strokeDashoffset="1000"
-        style={{ animation: 'draw-line 2.8s 0.3s ease-out forwards' }}
-      />
+      <Box sx={{ bgcolor: colors.charcoal, border: `1px solid ${colors.slate}`, borderLeft: `4px solid ${project.color}`, p: { xs: 2.5, sm: 4 }, minHeight: { sm: 255 } }}>
+        <Box role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+            <Box aria-hidden="true" sx={{ color: project.color, display: 'flex' }}>{project.icon}</Box>
+            <Typography sx={{ ...labelSx, color: project.status === 'live' ? colors.gold : colors.gray }}>
+              {project.status === 'live' ? 'Live project' : 'Coming soon'}
+            </Typography>
+          </Stack>
+          <Typography variant="h5" component="h3" sx={{ fontSize: { xs: '1.3rem', sm: '1.6rem' }, mb: 1 }}>{project.title}</Typography>
+          <Typography sx={{ ...secondarySx, maxWidth: 670, mb: 2 }}>{project.description}</Typography>
+          <Stack direction="row" flexWrap="wrap" useFlexGap gap={1} sx={{ mb: project.status === 'live' ? 2.5 : 0 }}>
+            {project.tags.map((tag) => (
+              <Typography key={tag} component="span" sx={{ fontFamily: mono, color: colors.gray, fontSize: '0.7rem', borderBottom: `1px solid ${colors.slate}` }}>{tag}</Typography>
+            ))}
+          </Stack>
+          {project.status === 'live' && (
+            <Button href={project.path} variant="outlined" size="small" sx={outlineSx}>Open {project.title}</Button>
+          )}
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1.5, mt: 2 }}>
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <IconButton aria-label="Previous project" onClick={() => select(index - 1)} sx={{ color: colors.bone }}><PreviousIcon /></IconButton>
+          <Typography sx={{ fontFamily: mono, fontSize: '0.8rem', minWidth: 58, textAlign: 'center' }} aria-hidden="true">
+            {String(index + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+          </Typography>
+          <IconButton aria-label="Next project" onClick={() => select(index + 1)} sx={{ color: colors.bone }}><NextIcon /></IconButton>
+          <IconButton
+            aria-label={reducedMotion ? 'Autoplay unavailable with reduced motion' : playing ? 'Pause project autoplay' : 'Play project autoplay'}
+            onClick={() => setPlaying((current) => !current)}
+            disabled={reducedMotion}
+            sx={{ color: colors.bone, ml: 1 }}
+          >
+            {playing && !reducedMotion ? <PauseIcon /> : <PlayIcon />}
+          </IconButton>
+        </Stack>
+        <Stack direction="row" spacing={0.5} aria-label="Choose a project">
+          {projects.map((item, position) => (
+            <IconButton
+              key={item.title}
+              aria-label={`Show ${item.title}, project ${position + 1} of ${projects.length}`}
+              aria-current={index === position ? 'true' : undefined}
+              onClick={() => select(position)}
+              sx={{ p: 1, color: index === position ? colors.gold : colors.gray }}
+            >
+              <Box component="span" sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: 'currentColor' }} />
+            </IconButton>
+          ))}
+        </Stack>
+      </Box>
+      <Box component="span" sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap' }} aria-live="polite" aria-atomic="true">
+        {announcement}
+      </Box>
     </Box>
   );
 }
 
 export default function LandingPage() {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: BG_BASE, color: 'white' }}>
-      <style>{`
-        @keyframes draw-line {
-          to { stroke-dashoffset: 0; }
-        }
-      `}</style>
-
+    <Box sx={{ minHeight: '100vh', bgcolor: colors.navy, color: colors.bone }}>
       {/* Nav */}
-      <Box
-        sx={{
-          position: 'sticky', top: 0, zIndex: 10,
-          borderBottom: '2px solid rgba(80,137,173,0.4)',
-          bgcolor: 'rgba(21,42,66,0.9)',
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontWeight: 800, letterSpacing: '-0.02em', fontFamily: RETRO_FONT }}>
-            JT
-          </Typography>
-          <Stack direction="row" spacing={3} sx={{ display: { xs: 'none', sm: 'flex' } }}>
-            {['Experience', 'Skills', 'Projects', 'Contact'].map((label) => (
-              <Typography
-                key={label}
-                variant="body2"
-                sx={{ color: 'rgba(169,171,174,0.85)', cursor: 'pointer', '&:hover': { color: 'white' }, fontFamily: RETRO_FONT }}
-                onClick={() => document.getElementById(label.toLowerCase())?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                {label}
-              </Typography>
+      <Box component="header" sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: colors.ink, borderBottom: `1px solid ${colors.slate}` }}>
+        <Container maxWidth="lg" sx={{ py: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+          <Box component="a" href="#top" sx={{ fontFamily: mono, fontWeight: 700, fontSize: '1.15rem', textDecoration: 'none', color: colors.bone }}>JT<span style={{ color: colors.gold }}>.</span></Box>
+          <Box component="nav" aria-label="Page sections" sx={{ display: 'flex', gap: { xs: 1.5, sm: 3 }, width: { xs: '100%', sm: 'auto' }, overflowX: 'auto', whiteSpace: 'nowrap' }}>
+            {['Projects', 'About', 'Experience', 'Skills', 'Contact'].map((label) => (
+              <Box key={label} component="a" href={`#${label.toLowerCase()}`} sx={{ color: colors.gray, fontFamily: mono, fontSize: { xs: '0.68rem', sm: '0.75rem' }, textDecoration: 'none', py: 0.5, '&:hover': { color: colors.bone } }}>{label}</Box>
             ))}
-          </Stack>
-        </Container>
-      </Box>
-
-      {/* Hero */}
-      <Box
-        sx={{
-          background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${SLATE} 55%, ${MAROON} 100%)`,
-          py: { xs: 10, md: 16 },
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <LineChartMotif />
-        <Container maxWidth="md" sx={{ position: 'relative' }}>
-          <Typography
-            variant="h2"
-            component="h1"
-            sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}
-          >
-            Jeremy Terhaar
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 1, color: ACCENT, fontWeight: 600 }}>
-            Software Engineer — DevOps &amp; Platform Engineering
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 5, color: 'rgba(169,171,174,0.8)', maxWidth: 560, mx: 'auto' }}>
-            9+ years building and scaling high-availability systems for enterprise supply chain
-            platforms — CI/CD frameworks, deployment automation, and infrastructure tooling that
-            improve engineering velocity and reliability.
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<DownloadIcon />}
-              sx={{ bgcolor: ACCENT, '&:hover': { bgcolor: '#832f2f' }, px: 4, fontWeight: 700 }}
-              href="/resume.pdf"
-              target="_blank"
-            >
-              Download Resume
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              sx={{ borderColor: 'rgba(169,171,174,0.4)', color: 'white', px: 4, '&:hover': { borderColor: 'white', bgcolor: 'rgba(80,137,173,0.1)' } }}
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Get in Touch
-            </Button>
           </Box>
         </Container>
       </Box>
 
-      {/* Experience */}
-      <Container maxWidth="md" id="experience" sx={{ py: 10 }}>
-        <Typography variant="overline" sx={{ display: 'block', textAlign: 'center', color: ACCENT, mb: 1, letterSpacing: 3 }}>
-          Experience
-        </Typography>
-        <Typography variant="h4" component="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 700 }}>
-          Where I&apos;ve Worked
-        </Typography>
-        <Stack spacing={4}>
-          {experience.map((job) => (
-            <Card key={job.company} sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
-              <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-                  <Box
-                    sx={{
-                      width: 48, height: 48, borderRadius: 2,
-                      bgcolor: 'rgba(156,50,48,0.15)', border: `1px solid ${ACCENT}40`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: ACCENT,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <WorkIcon />
-                  </Box>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>{job.company}</Typography>
-                    {job.roles.map((role) => (
-                      <Typography key={role.title} variant="body2" sx={{ color: 'rgba(169,171,174,0.78)' }}>
-                        {role.title} &middot; {role.dates}
-                      </Typography>
-                    ))}
-                  </Box>
-                </Box>
-                <Stack spacing={1} sx={{ pl: { xs: 0, md: 1 } }}>
-                  {job.bullets.map((bullet, i) => (
-                    <Typography key={i} variant="body2" sx={{ color: 'rgba(169,171,174,0.82)', lineHeight: 1.8 }}>
-                      • {bullet}
-                    </Typography>
+      {/* Hero */}
+      <Box component="main" id="top" sx={{ scrollMarginTop: '112px' }}>
+        <Box sx={{ bgcolor: colors.ink, borderBottom: `1px solid ${colors.slate}` }}>
+          <Container maxWidth="lg" sx={{ py: { xs: 6, md: 9 }, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: { xs: 3, md: 7 }, alignItems: 'end' }}>
+            <Box>
+              <Typography sx={{ ...labelSx, mb: 2 }}>Software engineering / Minneapolis, MN</Typography>
+              <Typography variant="h1" sx={{ fontSize: { xs: '2.2rem', sm: '3rem', md: '3.7rem' }, letterSpacing: '-0.055em', lineHeight: 1.12, mb: 2 }}>Jeremy Terhaar<span style={{ color: colors.gold }}>.</span></Typography>
+              <Typography sx={{ color: colors.sky, fontWeight: 600, fontSize: { xs: '1rem', md: '1.15rem' }, mb: 2 }}>Software Engineer — DevOps &amp; Platform Engineering</Typography>
+              <Typography sx={{ ...secondarySx, maxWidth: 660 }}>Building reliable supply-chain systems, deployment platforms and tools that help engineering teams ship with confidence.</Typography>
+            </Box>
+            <Stack direction={{ xs: 'row', md: 'column' }} alignItems={{ xs: 'flex-start', md: 'stretch' }} flexWrap="wrap" gap={1.5} sx={{ maxWidth: { md: 230 } }}>
+              <Button href="/resume.pdf" target="_blank" rel="noopener noreferrer" startIcon={<DownloadIcon />} variant="contained" color="secondary" sx={{ bgcolor: colors.mustard, color: colors.ink, '&:hover': { bgcolor: colors.gold } }}>View résumé</Button>
+              <Button href="#contact" variant="outlined" sx={outlineSx}>Get in touch</Button>
+            </Stack>
+          </Container>
+        </Box>
+
+        {/* Projects */}
+        <Container maxWidth="lg" component="section" id="projects" sx={sectionSx}>
+          <SectionHeading index="01" title="Featured apps" />
+          <ProjectsCarousel />
+        </Container>
+
+        {/* About */}
+        <Box sx={{ bgcolor: colors.ink }}>
+          <Container maxWidth="lg" component="section" id="about" sx={sectionSx}>
+            <SectionHeading index="02" title="About" />
+            <Typography sx={{ ...secondarySx, maxWidth: 780 }}>I’m a software engineer based in Minneapolis, focused on CI/CD, infrastructure automation and reliable systems. Outside of work I build full-stack projects, including a basketball league platform and browser games, to keep learning and stay hands-on.</Typography>
+          </Container>
+        </Box>
+
+        {/* Experience */}
+        <Container maxWidth="lg" component="section" id="experience" sx={sectionSx}>
+          <SectionHeading index="03" title="Experience" />
+          <Stack spacing={0}>
+            {experience.map((job) => (
+              <Box key={job.company} sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: { xs: 1.5, md: 4 }, py: 2.5, borderBottom: `1px solid ${colors.slate}` }}>
+                <Box>
+                  <Typography variant="h6" sx={{ fontSize: '1.05rem', mb: 0.5 }}>{job.company}</Typography>
+                  {job.roles.map((role) => (
+                    <Typography key={role.title} variant="body2" sx={secondarySx}>{role.title} · {role.dates}</Typography>
                   ))}
-                </Stack>
-              </CardContent>
-            </Card>
-          ))}
-          <Card sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
-            <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                sx={{
-                  width: 48, height: 48, borderRadius: 2,
-                  bgcolor: 'rgba(80,137,173,0.15)', border: `1px solid ${ACCENT_BLUE}40`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: ACCENT_BLUE,
-                  flexShrink: 0,
-                }}
-              >
-                <SchoolIcon />
+                </Box>
+                <Box component="ul" sx={{ m: 0, pl: 2.5, color: colors.gray, '& li': { mb: 0.75, lineHeight: 1.6 }, '& li::marker': { color: colors.steel } }}>
+                  {job.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                </Box>
               </Box>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>University of Minnesota, Twin Cities</Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(169,171,174,0.78)' }}>
-                  B.A., Computer Science &amp; German, Scandinavian and Dutch Studies &middot; 2016
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        </Stack>
-      </Container>
-
-      {/* Skills */}
-      <Container maxWidth="lg" id="skills" sx={{ py: 10 }}>
-        <Typography variant="overline" sx={{ display: 'block', textAlign: 'center', color: ACCENT, mb: 1, letterSpacing: 3 }}>
-          Skills
-        </Typography>
-        <Typography variant="h4" component="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 700 }}>
-          Technical Toolkit
-        </Typography>
-        <Grid container spacing={3}>
-          {skillGroups.map((group) => (
-            <Grid item xs={12} sm={6} key={group.label}>
-              <Typography variant="subtitle2" sx={{ color: 'rgba(169,171,174,0.7)', mb: 1.5, letterSpacing: 1, fontFamily: RETRO_FONT }}>
-                {group.label.toUpperCase()}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {group.items.map((skill) => (
-                  <Chip
-                    key={skill}
-                    label={skill}
-                    sx={{
-                      bgcolor: 'rgba(80,137,173,0.15)',
-                      color: 'rgba(169,171,174,0.95)',
-                      border: '2px solid rgba(80,137,173,0.4)',
-                      '&:hover': { bgcolor: 'rgba(156,50,48,0.2)', borderColor: ACCENT },
-                      transition: 'all 0.2s',
-                      fontFamily: RETRO_FONT,
-                    }}
-                  />
-                ))}
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-
-      {/* Projects */}
-      <Box id="projects" sx={{ py: 10 }}>
-        <Container maxWidth="lg">
-          <Typography variant="overline" sx={{ display: 'block', textAlign: 'center', color: ACCENT, mb: 1, letterSpacing: 3 }}>
-            Projects
-          </Typography>
-          <Typography variant="h4" component="h2" sx={{ textAlign: 'center', mb: 2, fontWeight: 700 }}>
-            Featured Apps
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center', color: 'rgba(169,171,174,0.7)', mb: 8 }}>
-            A few things I&apos;ve built outside of work.
-          </Typography>
-          <Grid container spacing={3}>
-            {projects.map((project) => (
-              <Grid item xs={12} sm={6} key={project.title}>
-                <Card
-                  component={project.status === 'live' ? 'a' : 'div'}
-                  href={project.status === 'live' ? project.path : undefined}
-                  sx={{
-                    height: '100%',
-                    bgcolor: BG_CARD,
-                    border: '2px solid rgba(80,137,173,0.4)',
-                    borderRadius: 1,
-                    transition: 'transform 0.25s, box-shadow 0.25s, border-color 0.25s',
-                    textDecoration: 'none',
-                    display: 'block',
-                    ...(project.status === 'live' && {
-                      cursor: 'pointer',
-                      '&:hover': {
-                        transform: 'translateY(-6px)',
-                        boxShadow: `0 20px 40px rgba(0,0,0,0.4)`,
-                        borderColor: project.color,
-                      },
-                    }),
-                    ...(project.status === 'soon' && {
-                      opacity: 0.7,
-                      cursor: 'default',
-                    }),
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                      <Box
-                        sx={{
-                          width: 60, height: 60,
-                          borderRadius: 2,
-                          bgcolor: project.bgDark,
-                          border: `1px solid ${project.color}40`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: project.color,
-                        }}
-                      >
-                        {project.icon}
-                      </Box>
-                      {project.status === 'live' ? (
-                        <Chip
-                          label="LIVE"
-                          size="small"
-                          sx={{ bgcolor: 'rgba(201,154,62,0.15)', color: ACCENT_MUSTARD, border: `1px solid ${ACCENT_MUSTARD}50`, fontSize: '0.65rem', fontWeight: 700 }}
-                        />
-                      ) : (
-                        <Chip
-                          label="COMING SOON"
-                          size="small"
-                          sx={{ bgcolor: 'rgba(80,137,173,0.1)', color: 'rgba(169,171,174,0.45)', border: '1px solid rgba(80,137,173,0.3)', fontSize: '0.65rem', fontWeight: 700 }}
-                        />
-                      )}
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>
-                      {project.title}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(169,171,174,0.78)', mb: 3, lineHeight: 1.7 }}>
-                      {project.description}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
-                      {project.tags.map((tag) => (
-                        <Box
-                          key={tag}
-                          sx={{
-                            px: 1.5, py: 0.4,
-                            borderRadius: 1,
-                            bgcolor: `${project.color}15`,
-                            border: `1px solid ${project.color}30`,
-                            fontSize: '0.7rem',
-                            color: project.color,
-                            fontWeight: 600,
-                          }}
-                        >
-                          {tag}
-                        </Box>
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
             ))}
-          </Grid>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: { xs: 1, md: 4 }, py: 2.5, borderBottom: `1px solid ${colors.slate}` }}>
+              <Typography variant="h6" sx={{ fontSize: '1.05rem' }}>Education</Typography>
+              <Box>
+                <Typography sx={{ fontWeight: 600 }}>University of Minnesota, Twin Cities</Typography>
+                <Typography variant="body2" sx={secondarySx}>B.A., Computer Science &amp; German, Scandinavian and Dutch Studies · 2016</Typography>
+              </Box>
+            </Box>
+          </Stack>
+        </Container>
+
+        {/* Skills */}
+        <Box sx={{ bgcolor: colors.ink }}>
+          <Container maxWidth="lg" component="section" id="skills" sx={sectionSx}>
+            <SectionHeading index="04" title="Technical toolkit" />
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: { xs: 2, md: 4 } }}>
+              {skillGroups.map((group) => (
+                <Box key={group.label}>
+                  <Typography sx={{ ...labelSx, color: colors.sky, mb: 1 }}>{group.label}</Typography>
+                  <Typography sx={secondarySx}>{group.items.join('  ·  ')}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* Contact */}
+        <Container maxWidth="lg" component="section" id="contact" sx={sectionSx}>
+          <SectionHeading index="05" title="Contact" />
+          <Typography sx={{ ...secondarySx, mb: 2.5 }}>Interested in working together? Let’s talk.</Typography>
+          <Stack direction="row" flexWrap="wrap" gap={1.5}>
+            <Button variant="outlined" startIcon={<EmailIcon />} sx={outlineSx} href={`mailto:${CONTACT.email}`}>Email</Button>
+            <Button variant="outlined" startIcon={<LinkedInIcon />} sx={outlineSx} href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</Button>
+            <Button variant="outlined" startIcon={<GitHubIcon />} sx={outlineSx} href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub</Button>
+          </Stack>
         </Container>
       </Box>
 
-      {/* About */}
-      <Container maxWidth="md" sx={{ py: 10 }}>
-        <Card sx={{ bgcolor: BG_CARD, border: '2px solid rgba(80,137,173,0.4)', borderRadius: 1 }}>
-          <CardContent sx={{ p: { xs: 4, md: 6 }, textAlign: 'center' }}>
-            <Typography variant="overline" sx={{ color: ACCENT, letterSpacing: 3 }}>
-              About
-            </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, mt: 1, mb: 3 }}>
-              Focused on reliability, automation, and clean systems
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(169,171,174,0.8)', lineHeight: 1.9, mb: 2 }}>
-              I&apos;m a software engineer based in Minneapolis, MN, specializing in DevOps and platform
-              engineering — designing CI/CD frameworks, deployment automation, and infrastructure
-              tooling that improve engineering velocity and system reliability.
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(169,171,174,0.8)', lineHeight: 1.9 }}>
-              Outside of work, I build full-stack side projects like a basketball league management
-              platform and a handful of browser games — a way to keep learning and stay hands-on
-              with new tools.
-            </Typography>
-          </CardContent>
-        </Card>
-      </Container>
-
-      {/* Contact */}
-      <Container maxWidth="md" id="contact" sx={{ py: 10 }}>
-        <Typography variant="overline" sx={{ display: 'block', textAlign: 'center', color: ACCENT, mb: 1, letterSpacing: 3 }}>
-          Contact
-        </Typography>
-        <Typography variant="h4" component="h2" sx={{ textAlign: 'center', mb: 5, fontWeight: 700 }}>
-          Let&apos;s Connect
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Button
-            variant="outlined"
-            startIcon={<EmailIcon />}
-            sx={{ borderColor: 'rgba(169,171,174,0.4)', color: 'white', px: 3, '&:hover': { borderColor: ACCENT, bgcolor: 'rgba(156,50,48,0.12)' } }}
-            href={`mailto:${CONTACT.email}`}
-          >
-            Email
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<LinkedInIcon />}
-            sx={{ borderColor: 'rgba(169,171,174,0.4)', color: 'white', px: 3, '&:hover': { borderColor: ACCENT_BLUE, bgcolor: 'rgba(80,137,173,0.12)' } }}
-            href={CONTACT.linkedin}
-            target="_blank"
-          >
-            LinkedIn
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<GitHubIcon />}
-            sx={{ borderColor: 'rgba(169,171,174,0.4)', color: 'white', px: 3, '&:hover': { borderColor: 'white', bgcolor: 'rgba(80,137,173,0.1)' } }}
-            href={CONTACT.github}
-            target="_blank"
-          >
-            GitHub
-          </Button>
-        </Box>
-      </Container>
-
       {/* Footer */}
-      <Divider sx={{ borderColor: 'rgba(80,137,173,0.4)', borderWidth: 2 }} />
-      <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body2" sx={{ color: 'rgba(169,171,174,0.6)', fontFamily: RETRO_FONT }}>
-          © {new Date().getFullYear()} Jeremy Terhaar
-        </Typography>
+      <Box component="footer" sx={{ borderTop: `1px solid ${colors.slate}`, py: 3 }}>
+        <Container maxWidth="lg"><Typography variant="body2" sx={{ fontFamily: mono, color: colors.gray }}>© {new Date().getFullYear()} Jeremy Terhaar</Typography></Container>
       </Box>
     </Box>
   );

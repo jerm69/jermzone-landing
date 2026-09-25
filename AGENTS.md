@@ -15,6 +15,9 @@ npm run dev          # localhost:3002
 ./deploy.sh          # or: jz deploy landing
 ```
 
+`npm run lint` currently prompts to configure ESLint instead of running checks;
+use `npx tsc --noEmit` and `npm run build` until lint is configured.
+
 ## Deploy
 
 Builds **locally** and rsyncs `.next`. It previously built on the Pi, which
