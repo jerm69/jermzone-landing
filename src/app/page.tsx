@@ -5,7 +5,7 @@ import { Box, Button, Container, IconButton, Stack, Typography } from '@mui/mate
 import {
   SportsBasketball as BasketballIcon,
   SportsEsports as GamesIcon,
-  FlightTakeoff as FlightIcon,
+  CloudOutlined as WeatherIcon,
   Dashboard as DashboardIcon,
   GitHub as GitHubIcon,
   LinkedIn as LinkedInIcon,
@@ -44,12 +44,13 @@ const projects = [
     status: 'live' as const,
   },
   {
-    title: 'FlightRadar Live',
-    description: 'An upcoming flight-tracking project exploring live ADS-B data, aircraft details and flight history.',
-    icon: <FlightIcon fontSize="large" />,
+    title: 'Weather Station',
+    description: 'A retro weather broadcast with forecasts for the cities you choose and a late-night soundtrack.',
+    icon: <WeatherIcon fontSize="large" />,
     color: colors.orange,
-    tags: ['ADS-B', 'Maps', 'Real-time', 'API'],
-    status: 'soon' as const,
+    path: '/weather',
+    tags: ['Next.js', 'Open-Meteo', 'Audio', 'Weather'],
+    status: 'live' as const,
   },
   {
     title: 'Dev Dashboard',
